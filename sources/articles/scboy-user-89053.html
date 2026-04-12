@@ -1,0 +1,645 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<link rel="stylesheet" href="plugin/RustyHare_dark_mode/view/css/RHDarkMode.css">
+<style>#dark-mode-modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.4);}#dark-mode-modal-content{background-color:#fefefe;margin:15% auto;padding:20px;border:1px solid #888;width:80%;max-width:500px;border-radius:5px;}.dark-theme #dark-mode-modal-content{background-color:#2d2d2d;border-color:#444;color:#e0e0e0;}#dark-mode-modal-close{color:#aaa;float:right;font-size:28px;font-weight:bold;cursor:pointer;}#dark-mode-modal-close:hover,#dark-mode-modal-close:focus{color:black;text-decoration:none;cursor:pointer;}.dark-theme #dark-mode-modal-close:hover,.dark-theme #dark-mode-modal-close:focus{color:white;}.time-input{width:60px;display:inline-block;text-align:center;}.time-setting{margin:10px 0;padding:10px;border:1px solid #ddd;border-radius:4px;}.dark-theme .time-setting{border-color:#444;}.time-setting:disabled{background-color:#f5f5f5;opacity:0.6;}.dark-theme .time-setting:disabled{background-color:#3d3d3d;}.form-group{margin-bottom:15px;}.form-check{margin-bottom:10px;}.time-row{display:flex;align-items:center;margin-bottom:10px;}.time-label{width:80px;margin-right:10px;}.time-input-group{display:flex;align-items:center;}.time-colon{margin:0 5px;}</style>
+<script>function rhSetDarkMode(bDarkModeEnabled) {let expirationDate =new Date();expirationDate.setFullYear(expirationDate.getFullYear() + 1);let expires ="; expires=" + expirationDate.toUTCString();switch (bDarkModeEnabled) {case true:document.cookie ="rhDarkMode=true;" + expires;break;case false:document.cookie ="rhDarkMode=false;" + expires;break;default:document.cookie ="rhDarkMode=false;expires=Thu, 01 Jan 1970 00:00:00 GMT";break;}
+}
+function rhGetDarkMode() {let name ="rhDarkMode=";let documentCookie =document.cookie;let cookieArray =documentCookie.split(";");for (let i =0;i < cookieArray.length;i++) {let aPieceOfCookie =cookieArray[i].trim();if (aPieceOfCookie.indexOf(name) ==0) {return aPieceOfCookie.substring(name.length,aPieceOfCookie.length) =="true";}
+}
+return false;}
+function rhSetDarkModeAuto(bAutoEnabled) {let expirationDate =new Date();expirationDate.setFullYear(expirationDate.getFullYear() + 1);let expires ="; expires=" + expirationDate.toUTCString();switch (bAutoEnabled) {case true:document.cookie ="rhDarkModeAuto=true;" + expires;break;case false:document.cookie ="rhDarkModeAuto=false;" + expires;break;default:document.cookie ="rhDarkModeAuto=false;expires=Thu, 01 Jan 1970 00:00:00 GMT";break;}
+}
+function rhGetDarkModeAuto() {let name ="rhDarkModeAuto=";let documentCookie =document.cookie;let cookieArray =documentCookie.split(";");for (let i =0;i < cookieArray.length;i++) {let aPieceOfCookie =cookieArray[i].trim();if (aPieceOfCookie.indexOf(name) ==0) {return aPieceOfCookie.substring(name.length,aPieceOfCookie.length) =="true";}
+}
+return false;}
+function rhSetDarkModePeriod(iH1 =0,iM1 =0,iH2 =0,iM2 =0) {let name ="rhDarkModePeriod=";let value =iH1.toString().padStart(2,'0') + ":" + iM1.toString().padStart(2,'0') + "-" +
+iH2.toString().padStart(2,'0') + ":" + iM2.toString().padStart(2,'0');let expirationDate =new Date();expirationDate.setFullYear(expirationDate.getFullYear() + 1);let expires ="; expires=" + expirationDate.toUTCString();document.cookie =name + value + ";" + expires;}
+function rhGetDarkModePeriod() {let name ="rhDarkModePeriod=";let documentCookie =document.cookie;let cookieArray =documentCookie.split(";");for (let i =0;i < cookieArray.length;i++) {let aPieceOfCookie =cookieArray[i].trim();if (aPieceOfCookie.indexOf(name) ==0) {let value =aPieceOfCookie.substring(name.length,aPieceOfCookie.length);let times =value.split("-");if (times.length ===2) {let start =times[0].split(":");let end =times[1].split(":");if (start.length ===2 &&end.length ===2) {return {startHour:parseInt(start[0]),startMinute:parseInt(start[1]),endHour:parseInt(end[0]),endMinute:parseInt(end[1])
+};}
+}
+}
+}
+return {startHour:21,startMinute:0,endHour:7,endMinute:0
+};}
+function rhIsWithinDarkModePeriod() {let period =rhGetDarkModePeriod();let now =new Date();let currentHour =now.getHours();let currentMinute =now.getMinutes();let currentTotalMinutes =currentHour *60 + currentMinute;let startTotalMinutes =period.startHour *60 + period.startMinute;let endTotalMinutes =period.endHour *60 + period.endMinute;if (startTotalMinutes >endTotalMinutes) {return currentTotalMinutes >=startTotalMinutes ||currentTotalMinutes <=endTotalMinutes;} else {return currentTotalMinutes >=startTotalMinutes &&currentTotalMinutes <=endTotalMinutes;}
+}
+(function () {console.log("loading dark mode..")
+let isDarkModeEnabled =rhGetDarkMode();let isAutoEnabled =rhGetDarkModeAuto();let shouldApplyDarkMode =isAutoEnabled ?(isDarkModeEnabled &&rhIsWithinDarkModePeriod()) :isDarkModeEnabled;const html =document.documentElement;if (shouldApplyDarkMode) {html.classList.add('dark-theme');} else {html.classList.remove('dark-theme');}
+window.rhToggleDarkMode =function (enable) {if (enable ===undefined) {enable =!html.classList.contains('dark-theme');}
+rhSetDarkMode(enable);if (enable) {html.classList.add('dark-theme');} else {html.classList.remove('dark-theme');}
+};})()
+document.addEventListener('DOMContentLoaded',function() {createDarkModeModal();const darkModeBtn =document.getElementById('nav-darkmode');if (darkModeBtn) {darkModeBtn.addEventListener('click',function(e) {e.preventDefault();showDarkModeModal();});}
+});function createDarkModeModal() {if (document.getElementById('dark-mode-modal')) {return;}
+const modal =document.createElement('div');modal.id ='dark-mode-modal';const modalContent =document.createElement('div');modalContent.id ='dark-mode-modal-content';const closeBtn =document.createElement('span');closeBtn.id ='dark-mode-modal-close';closeBtn.innerHTML ='&times;';const title =document.createElement('h2');title.textContent ='夜间模式设置';const formHTML =`
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="dark-mode-toggle"> 启用夜间模式
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="dark-mode-auto"> 定时开关
+            </label>
+        </div>
+        <div class="time-setting" id="time-setting">
+            <div class="time-row">
+                <div class="time-label">启用时间：</div>
+                <div class="time-input-group">
+                    <input type="number" id="start-hour" class="form-control time-input" min="0" max="23" placeholder="时"> 
+                    <span class="time-colon">:</span>
+                    <input type="number" id="start-minute" class="form-control time-input" min="0" max="59" placeholder="分">
+                </div>
+            </div>
+            <div class="time-row">
+                <div class="time-label">停用时间：</div>
+                <div class="time-input-group">
+                    <input type="number" id="end-hour" class="form-control time-input" min="0" max="23" placeholder="时"> 
+                    <span class="time-colon">:</span>
+                    <input type="number" id="end-minute" class="form-control time-input" min="0" max="59" placeholder="分">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button id="save-dark-mode-settings" class="btn btn-primary">保存设置</button>
+            <button id="cancel-dark-mode-settings" class="btn btn-secondary">取消</button>
+        </div>
+    `;modalContent.appendChild(closeBtn);modalContent.appendChild(title);modalContent.innerHTML +=formHTML;modal.appendChild(modalContent);document.body.appendChild(modal);document.getElementById("dark-mode-modal-close").onclick =closeDarkModeModal;document.getElementById('cancel-dark-mode-settings').addEventListener('click',closeDarkModeModal);document.getElementById('dark-mode-auto').addEventListener('change',toggleTimeSetting);document.getElementById('save-dark-mode-settings').addEventListener('click',saveDarkModeSettings);window.addEventListener('click',function(event) {if (event.target ==modal) {closeDarkModeModal();}
+});}
+function showDarkModeModal() {const modal =document.getElementById('dark-mode-modal');if (!modal) return;const isDarkModeEnabled =rhGetDarkMode();const isAutoEnabled =rhGetDarkModeAuto();const period =rhGetDarkModePeriod();document.getElementById('dark-mode-toggle').checked =isDarkModeEnabled;document.getElementById('dark-mode-auto').checked =isAutoEnabled;document.getElementById('start-hour').value =period.startHour;document.getElementById('start-minute').value =period.startMinute;document.getElementById('end-hour').value =period.endHour;document.getElementById('end-minute').value =period.endMinute;toggleTimeSetting();modal.style.display ='block';}
+function closeDarkModeModal() {const modal =document.getElementById('dark-mode-modal');if (modal) {modal.style.display ='none';}
+}
+function toggleTimeSetting() {const isAutoEnabled =document.getElementById('dark-mode-auto').checked;const timeSetting =document.getElementById('time-setting');const inputs =timeSetting.querySelectorAll('input');inputs.forEach(input =>{input.disabled =!isAutoEnabled;});timeSetting.style.opacity =isAutoEnabled ?'1' :'0.6';}
+function saveDarkModeSettings() {const isDarkModeEnabled =document.getElementById('dark-mode-toggle').checked;const isAutoEnabled =document.getElementById('dark-mode-auto').checked;const startHour =parseInt(document.getElementById('start-hour').value) ||0;const startMinute =parseInt(document.getElementById('start-minute').value) ||0;const endHour =parseInt(document.getElementById('end-hour').value) ||0;const endMinute =parseInt(document.getElementById('end-minute').value) ||0;rhSetDarkMode(isDarkModeEnabled);rhSetDarkModeAuto(isAutoEnabled);rhSetDarkModePeriod(startHour,startMinute,endHour,endMinute);const html =document.documentElement;const shouldApplyDarkMode =isAutoEnabled ?(isDarkModeEnabled &&rhIsWithinDarkModePeriod()) :isDarkModeEnabled;if (shouldApplyDarkMode) {html.classList.add('dark-theme');} else {html.classList.remove('dark-theme');}
+closeDarkModeModal();}
+</script>
+<link rel="stylesheet" type="text/css" href="plugin/RustyHare_spinach/view/awb.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="欢迎来到孙哥黄哥和法人三个人一言堂的世界。
+SCBOY论坛汇聚众多星际争霸2赛事新闻、攻略、视频、趣闻，是星际老男孩SCBOY与猛男们的聚集地。" />
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<meta http-equiv="Cache-Control" content="no-transform"/>
+<meta http-equiv="Cache-Control" content="no-siteapp"/>
+<title>土豆黄2024</title>
+<link rel="shortcut icon" href="view/img/favicon.ico" />
+<link rel="icon" sizes="32x32" href="view/img/favicon.ico">
+<link rel="Bookmark" href="view/img/favicon.ico" />
+<style>.tag_option{border:1px solid #bbb;padding:1px 10px;border-radius:10px;text-decoration:none;}.tag_option:active,.tag_option.active{border:1px solid #000;background:#000;color:#fff;text-decoration:none;}.nav_tag_list a{color:#1f4977;}</style>
+<link rel="stylesheet" href="view/css/bootstrap.css?2.0.29">
+<link rel="stylesheet" href="view/css/bootstrap-bbs.css?2.0.29">
+<link rel="stylesheet" href="plugin/huux_notice/view/css/huux-notice.css" name="huux_notice"><style data-for="huux-postlist">.postlist-orderby-uid{font-size:12px;cursor:pointer;outline:none;}.postlist-orderby-uid>span:last-child{display:none}.postlist-orderby-uid.active>span:first-child{display:none}.postlist-orderby-uid.active>span:last-child{display:inline-block}.postlist-sort{cursor:pointer;vertical-align:middle;outline:none;width:16px;height:16px;}.postlist-sort svg{fill:var(--gray)}.postlist-sort.active>.desc,.postlist-sort>.asc{display:none}.postlist-sort.active>.asc{display:block}.postlist .post.newpost{opacity: 1}
+</style>
+<link rel="stylesheet" href="/plugin/bbwidc_mobile/css/all.css"><style>.badge-lock{opacity:0.2;}.badge-button{text-align:center;margin:15px 0 0 0;}.badge-name{height:2rem;line-height:2rem;text-align:center;}.badge-date{text-align:center;font-size:0.8rem;}.badge-tag-content{height:4.5rem;}.badge-tag{font-size:0.68rem;text-align:center;width:40%;margin:0.5rem 4% 0 4%;color:#ffffff;border-radius:0.5rem;display:inline-block;padding:0.25em 0.4em;}.badge-img{border-radius:50%;border:3px solid #ccc;}.badge-content{padding:10px;width:100%;border:1px solid #ddd;box-shadow:5px 5px 10px#c9dce5;background-color:#ebebeb;background-size:20%;background-repeat:repeat;border-radius:15px;}</style><style>@keyframes xndigest{0%{color:red;text-shadow:0 0 3px #FF8D8D;}20%{color:orange;text-shadow:0 0 3px #FFE1AD;}40%{color:green;text-shadow:0 0 3px #B3FFAF;}65%{color:blue;text-shadow:0 0 3px #AFE4FF;}80%{color:purple;text-shadow:0 0 3px #FFC9F3;}100%{color:red;text-shadow:0 0 3px #FF8D8D;}}i.icon-diamond.flash{color:#D53D38;}i.icon-digest-1{text-shadow:0 0 3px #AFE4FF;}i.icon-digest-2{text-shadow:0 0 3px #FFF177;}i.icon-digest-3{text-shadow:0 0 3px #FF8D8D;}.icon-digest-1:before{content:"\f219";color:#5BC0DE;}.icon-digest-2:before{content:"\f219";color:#ECA541;}.icon-digest-3:before{content:"\f219";color:#D53D38;}.icon-digest-3:afteer{content:"精";color:#D53D38;}</style><style>.deleted div.subject>a{text-decoration:line-through;color:grey !important;}.deleted div.message{text-decoration:line-through;color:grey !important;}</style><style>.update_log_list a.update_log_history,.update_log_list a.update_log_delete{display:none;}.update_log_list>li:hover{background:var(--gray-300);}.update_log_list>li:hover>a.update_log_history,.update_log_list>li:hover>a.update_log_delete{display:inline-block;}</style><style>body{background-image:url(plugin/xn_theme_xiaose/img/bg26.jpg),url(plugin/xn_theme_xiaose/img/bg26-pattern.jpg);background-color:#7495a6;background-repeat:no-repeat,repeat;background-size:contain;background-position:top center,0 0px;}#header{background:rgba(0,0,0,0.5) !important;position:fixed;z-index:999;}#footer{background:rgba(0,0,0,0.5) !important;}.card>.card-header{background-image:none;background-color:#fff !important;}.card{background:#fff !important;}.thread .media-body .xs-thread-a{color:#333;}.text-grey{color:#7a7159 !important;}.thread,.post{border-bottom:1px solid #dfeef2;}.input-group .form-control,.input-group .custom-select,.input-group .custom-file{background:rgba(255,255,255,0.7);}.card-header-tabs>.nav-item>.nav-link.active{background-image:linear-gradient(0deg,#dfedf4,#f2f2f2);border-color:#c9dce5;border-bottom-color:#dfebf1;}.btn-secondary{background-color:#405763;border-color:#3b515d;}.btn-secondary:hover{background-color:#374b55;border-color:#344751;}.blockquote{background:#d2e4f9;}.home-cate{justify-content:space-between;flex-direction:row !important;font-size:12px;}.card-postlist .card-body .badge-secondary{background-color:#868e96 !important;color:#fff !important;padding:5px !important;}.home-cate .col-lg-4{padding:0;}.home-cate .hometit{padding-left:25px;margin-left:15px;border-bottom:1px #ccc dashed;}.hometit{font-size:14px;height:35px;line-height:35px;color:#333;background-image:url('plugin/xn_theme_xiaose/img/zs.png');background-repeat:no-repeat;background-position:0 8px;}.card-header .hometit{padding-left:25px;background-position:0 -1px;}.card-header .card-title{color:#333;}.card-title{color:#333;}.hu-li{display:inline-flex;width:47%;margin-right:2%;border:1px solid #ddd;margin-bottom:2%;padding:10px !important;}.hu-li:hover{border:1px solid #ccc;}.li-right{flex-direction:column;display:flex;padding:0 1rem;}.icon-xiuno{width:16px;height:16px;display:inline-block;overflow:hidden;background:url(plugin/xn_theme_xiaose/img/icon.gif) no-repeat;background-position:0px 0px;}.icon-post-blue{background-position:0px 0px !important;height:11px;}.icon-post-white{background-position:-16px 0 !important;height:11px;}.icon-post-red{background-position:-32px 0px !important;height:11px;}.text-muted{font-size:12px;color:#666 !important;}.text-muted b{color:#000 !important;}.tm-all{background:url(plugin/xn_theme_xiaose/img/icon-n.png) no-repeat;background-position:0px 0px;background-repeat:no-repeat;padding-left:22px;}.p-t-sm,.breadcrumb{position:relative;margin-top:10px;background-color:rgba(255,255,255,0.8) !important;padding:10px;margin-bottom:10px;border-radius:0.25rem;}.breadcrumb{border:none;}.breadcrumb a{color:#333333;}.thread{padding:0.5rem 0;}#footer .container{color:#ffe5ae}#body>.container{margin-top:3.5rem;}#footer .text-muted b,#footer .text-right b{color:#ccc !important;}.tit-right a{color:#333}.blog-tit a{color:#333}.home-date{color:#006fd9}.blog-tit{text-overflow:ellipsis;white-space:nowrap;overflow:hidden;flex:0 0 86%;max-width:86%;}.threadlist td a{color:#333333 !important;}.line-height-2 a{color:#333333}.btn-secondary,.btn-primary{background-color:#09347f;border-color:#09347f;color:#fff;}.btn-secondary:hover,.btn-primary:hover{background-color:#6497f0;border-color:#6497f0;color:#fff;}.card-header-dropdown .dropdown .dropdown-toggle{color:#1f4977;}.username .text-muted,.card-user-info .text-muted,.btn-toolbar .text-muted,.newpost .text-muted,.card-footer .text-muted{color:#8a8a8a !important;}.list-unstyled .text-grey{color:#8a8a8a !important;}.card-user-info .card-footer b{color:#5c5c5c}.list-unstyled .thread{padding:0.5rem 0.5rem;position:relative;}.media-body .small{padding:0 !important;}.message{color:#333;}.home-body,.home-cate{background-color:#fff !important;}.card-thread .media-body{color:#333}.card-body .small{color:#6c737b !important;padding:0.5rem;}.card-threadlist .card-body .justify-content-between{position:absolute;bottom:5px;left:7rem;width:85%;}.main{margin-top:8.3rem;}.aside{margin-top:8.9rem;}.avatar-5{width:6rem;height:6rem;border-radius:1.5rem;}.avatar-3{width:4rem;height:4rem;border-radius:1rem;}.avatar-2{width:2.5rem;height:2.5rem;border-radius:0.5rem;}img{border:0 !important;}.card-header-tabs>.nav-item>.nav-link.active{background-image:none;border-color:#09347f;background-color:#09347f;border-bottom-color:#09347f;color:#fff;}.approve_name{background:url(plugin/xn_theme_xiaose/img/vicon.png) no-repeat;padding-left:18px;color:#09347f;position:relative;}.approve_blue_name{background:url(view/img/v/blue-vicon.png) no-repeat;padding-left:18px;color:#09347f;position:relative;}.approve_red_name{background:url(view/img/v/red-vicon.png) no-repeat;padding-left:18px;color:#09347f;position:relative;}.approve_gold_name{background:url(view/img/v/gold-vicon.png) no-repeat;padding-left:18px;color:#09347f;position:relative;}.card-threadlist .approve_name,.approve_blue_name,.approve_red_name,.approve_gold_name{left:-3px;}.card-threadlist .card-body{padding-top:0;}.newpages{position:relative}.newpages .btn{position:absolute;top:5px;left:5px;}#atarget,.unchk,.chked{padding-left:15px;line-height:16px;background:url(plugin/xn_theme_xiaose/img/atarget.png) no-repeat 0 3px;color:#2a74a9;cursor:pointer;margin-right:18px;}#atarget{background-position:0 2px;color:#333333;}#atarget.atarget_1{background-position:0 -37px;}@media (max-width:576px){.home-cate{flex-direction:column !important;}.hu-li{width:100%;}.card-body .justify-content-between{position:relative;left:0;bottom:0;}.newpost .justify-content-between{position:inherit;}.newpages .btn{position:relative}.li-right{padding:0 0.2rem 0 1rem;}.main{margin-top:4.3rem}}.zblist{padding:14px;}.zblist .title{color:#333333;font-size:16px;border-bottom:1px #ebebeb solid;padding-bottom:10px;}.zblist .title span{background:url('plugin/sc_live/img/image-scboy-18.png') no-repeat;height:18px;display:inline-block;width:30px;position:relative;left:5px;top:4px;}.zblist .classify{font-size:14px;font-weight:bold;color:#333333;padding:10px 7px 0;}.zblist .list ul{padding:0;margin:0 0 0 15px;}.zblist .list li{list-style:none;}.zblist .list li p{padding:0;margin:0;padding-left:17px;}.zblist .list .bt{font-size:14px;background:url('plugin/sc_live/img/image-scboy-17.png') no-repeat;color:#333;background-position:0 10px;}.zblist .list .hot{background:url('plugin/sc_live/img/image-scboy-19.png') no-repeat;display:inline-block;width:22px;height:15px;position:relative;top:3px;left:3px;}.zblist .list .tit{color:#898989;font-size:12px;}.zblist .list .dy,.zblist .list .qe,.zblist .list .hy,.zblist .list .bl{display:inline-block;width:19px;height:19px;position:relative;left:3px;top:4px;}.zblist .list .dy{background:url('plugin/sc_live/img/image-scboy-20.png') no-repeat;}.zblist .list .qe{background:url('plugin/sc_live/img/image-scboy-21.png') no-repeat;}.zblist .list .hy{background:url('plugin/sc_live/img/image-scboy-22.png') no-repeat;}.zblist .list .bl{background:url('plugin/sc_live/img/image-scboy-23.png') no-repeat;}.zbpage{margin-top:20px;}.zbpage span{width:20px;height:20px;display:inline-block;text-align:center;line-height:20px;color:#999;font-size:12px;margin-right:10px;border-radius:5px;}.zbpage .active{background-color:#09347f;color:#fff;}.badges{list-style:none;position:absolute;width:5rem;float:left;margin-top:-8px;text-align:right;z-index:1;height:10px;}.Badge{width:22px;height:22px;margin-left:-13px;border-radius:11px;line-height:21px;color:#e88080;display:inline-block;vertical-align:middle;text-align:center;}.badges,.badges>dd{display:inline-block;}.has_vip{background:url(view/img/v/blue-vicon-min.png) no-repeat;background-position-y:center;padding-left:12px;color:#09347f;position:relative;}</style>
+<link rel="stylesheet" href="plugin/zl_share/static/share.min.css">
+</head>
+<body>
+<header class="navbar navbar-expand-lg navbar-dark bg-dark" id="header">
+<div class="container">
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav" aria-controls="navbar_collapse" aria-expanded="false" aria-label="展开菜单">
+<span class="navbar-toggler-icon"></span>
+</button>
+<a class="navbar-brand text-truncate" href="/">
+<img src="view/img/logo.png" class="logo-2">
+<span class="hidden-lg">土豆黄2024</span>
+</a>
+<a class="navbar-brand hidden-lg" href="?thread-create-0.htm" aria-label="发表主题"><i class="icon-edit icon"></i></a>
+<div class="collapse navbar-collapse" id="nav">
+<ul class="navbar-nav mr-auto">
+<li class="nav-item home" fid="0" data-active="fid-0"><a class="nav-link" href="."><i class="icon-home d-md-none"></i> 首页</a></li>
+<li class="nav-item" fid="2" data-active="fid-2">
+<a class="nav-link" href="?forum-2.htm"><i class="icon-circle-o d-md-none"></i> 乔伊雷酒吧 </a>
+</li>
+<li class="nav-item" fid="1" data-active="fid-1">
+<a class="nav-link" href="?forum-1.htm"><i class="icon-circle-o d-md-none"></i> 科普鲁星区</a>
+</li>
+<li class="nav-item" fid="13" data-active="fid-13">
+<a class="nav-link" href="?forum-13.htm"><i class="icon-circle-o d-md-none"></i> 直播讨论</a>
+</li>
+<li class="nav-item" fid="10" data-active="fid-10">
+<a class="nav-link" href="?forum-10.htm"><i class="icon-circle-o d-md-none"></i> 炉石传说</a>
+</li>
+</li>
+<li class="nav-item" fid="6" data-active="fid-6">
+<a class="nav-link" href="?hero.htm"><i class="icon-circle-o d-md-none"></i> 英雄榜 </a>
+</li>
+<li class="nav-item" fid="" data-active="">
+<a class="nav-link" href="/?bet-home.htm">
+<i class="icon-circle-o d-md-none"></i>
+老板二楼请
+</a>
+</li>
+</ul>
+<ul class="navbar-nav">
+<li class="nav-item usernotice " id="nav-usernotice">
+<a class="nav-link" href="?my-notice.htm"><i class="icon icon-bell"></i> 消息 <span class="d-none unread badge badge-danger badge-pill" id="nav-usernotice-unread-notices">0</span>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="?search.htm"><i class="icon-search"></i> 搜索</a>
+</li>
+<li class="nav-item username"><a class="nav-link" href="?my.htm"><img class="avatar-1" src="https://www.scboy.cc/upload/avatar/000/22623.png?1730443059"> 小色教你用嘴打星际</a></li>
+<li class="nav-item"><a class="nav-link" href="?user-logout.htm"><i class="icon-sign-out"></i> 退出</a></li>
+</ul>
+</div>
+</div>
+</header>
+<main id="body">
+<div class="container">
+<div class="btn-group mb-3 d-lg-none" role="group" id="user_mobile_nav">
+<a role="button" class="btn btn-secondary" href="javascript:;" data-username="土豆黄2024" data-uid="89053" data-modal-url="?sx.htm" data-modal-title="给 土豆黄2024 发送私信" data-modal-arg="89053" title="发送私信">发消息</a>
+<a role="button" class="btn btn-secondary" data-active="menu-user" href="?user-89053.htm">个人资料</a>
+<a role="button" class="btn btn-secondary" data-active="menu-user-thread" href="?user-thread-89053.htm">论坛帖子</a>
+<a role="button" class="btn btn-secondary" data-active="menu-user-follow" href="?user-follow-follows-89053.htm">关注</a>
+</div>
+<div class="row">
+<div class="col-lg-2 hidden-md hidden-sm" id="user_aside">
+<div class="card">
+<div class="card-body text-center">
+<img class="avatar-4" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+<br>土豆黄2024 <br><span class="approve_blue_name" data-toggle="tooltip" data-original-title="蓝色大V"></span>
+<br>
+<button class="btn btn-sm btn-outline-secondary js-sc-follow-del" data-uid="89053" title="已关注">
+<i class="icon icon-check" aria-label="已关注"></i>
+<span class="sc-follow-btn">已关注</span>
+</button>
+</div>
+<div class="list-group list-group-flush text-center" id="user_nav">
+<a class="xi2 text-danger" href="javascript:;" data-username="土豆黄2024" data-uid="89053" data-modal-url="?sx.htm" data-modal-title="给 土豆黄2024 发送私信" data-modal-arg="89053" title="发送私信">
+发消息
+</a>
+<br>
+<a href="?user-89053.htm" class="list-group-item list-group-item-action" data-active="menu-user">个人资料</a>
+<a href="?user-thread-89053.htm" class="list-group-item list-group-item-action" data-active="menu-user-thread">论坛帖子</a>
+<a href="?user-follow-follows-89053.htm" class="list-group-item list-group-item-action" data-active="menu-user-follow">关注</a>
+</div>
+</div>
+</div>
+<div class="col-lg-10" id="user_main">
+<div class="card">
+<div class="card-header">
+<ul class="nav nav-tabs card-header-tabs">
+<li class="nav-item">
+<a class="nav-link" href="?user-89053.htm" data-active="user-profile">基本资料</a>
+</li>
+</ul>
+</div>
+<div class="card-body">
+<div class="row line-height-4">
+<div class="col-md-2 col-sm-12 text-center">
+<img class="logo-4" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+<br> <br><b>土豆黄2024 </b>
+<br>
+<span class="approve_blue_name" data-toggle="tooltip" data-original-title="蓝色大V"></span>
+<br>
+<button class="btn btn-sm btn-outline-secondary js-sc-follow-del" data-uid="89053" title="已关注">
+<i class="icon icon-check" aria-label="已关注"></i>
+<span class="sc-follow-btn">已关注</span>
+</button>
+</div>
+<div class="col-4 col-sm-5">
+<span class="text-muted">主题数：</span>71 <br><span class="text-muted">帖子数：</span>2635 <br />
+<span class="text-muted">粉丝数：</span>3106 <br><span class="text-muted">积分：</span>2450 <br><span class="text-muted">金币：</span>938 <br><span class="text-muted">精华数：</span>0 </div>
+<div class="col-auto">
+<span class="text-muted">用户组：</span>超级版主 <br><span class="text-muted">创建时间：</span>2024-02-14 <br><span class="text-muted">最后登录：</span>2026-02-24
+</div>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-lg-12 mx-auto">
+<div class="card">
+<div style="text-align: center;font-size: large;font-weight: bolder;margin-top: 10px;">收藏柜</div>
+<ul class="col-lg-12" style="padding-left:0;padding-right:0;display: inline-flex;flex-wrap:wrap;">
+</ul>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-lg-12 mx-auto">
+<div class="card">
+<div class="card-header d-flex justify-content-between">
+<div class="sc-follow-name">
+Ta的动态
+</div>
+</div>
+<div class="card-body">
+<style>.sc-follow-timeline-postlist .sc-follow-timeline-action{position:relative;padding:0.5rem;border-radius:0.25rem;margin-top:0.5rem;background:var(--gray-200);}.sc-follow-timeline-postlist .sc-follow-timeline-action:after{content:"";position:absolute;width:0;height:0;bottom:-12px;left:50px;border-width:6px;border-style:solid;border-color:var(--gray-200);-webkit-transform-origin:0 0;-webkit-transform:rotate(135deg);transform-origin:0 0;transform:rotate(135deg);}</style>
+<ul class="list-unstyled postlist sc-follow-timeline-postlist mb-0">
+<li class="media post sc-follow-timeline-12340999">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+44分钟前 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842319.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842319.htm#post_12340999" title="【SBTI】孙哥菡宝快来做题🤤（孙哥黄哥菡宝做完了）" class="text-grey">
+《【SBTI】孙哥菡宝快来做题🤤（孙哥黄哥菡宝做完了）》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842319.htm#post_12340999" title="主题回复">
+我是f&nbsp;uck，卧槽了 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12339854">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+昨天 17:53:34 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842574.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842574.htm#post_12339854" title="牛黄瞧尔萨斯要不也搞一个线下聚会节目" class="text-grey">
+《牛黄瞧尔萨斯要不也搞一个线下聚会节目》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842574.htm#post_12339854" title="主题回复">
+下半年可能会有个线下赛，不要急 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12338852">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+昨天 08:51:10 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842357.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842357.htm#post_12338852" title="小学都开始踢假球了吗？黄哥你还敢让黄一波在国内发展吗" class="text-grey">
+《小学都开始踢假球了吗？黄哥你还敢让黄一波在国内发展吗》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842357.htm#post_12338852" title="主题回复">
+我儿子对足球兴趣不大，我引导他踢了几次他都随便踢踢就不踢了。<br>还有国内足球真没啥好踢的，去欧洲我和我老婆也舍不得让他去，只能算了，老老实实当个快乐的小孩子就得了，爱玩啥玩啥 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12338847">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+昨天 08:49:02 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842357.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842357.htm#post_12338847" title="小学都开始踢假球了吗？黄哥你还敢让黄一波在国内发展吗" class="text-grey">
+《小学都开始踢假球了吗？黄哥你还敢让黄一波在国内发展吗》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842357.htm#post_12338847" title="主题回复">
+职业足球控分啥的很正常，但是那是职业足球。<br>小学生足球，从小就搞这么功利，真有点傻逼。小学生教练也是，他应该教小孩子不畏强敌敢打敢拼，遇到对面职业队又怎么样呢？踢就完事儿了，怕个锤子。至少我从小遇到的教练也好，队友也好，都是这个心态，从来没想过控分输球避开强队保成绩的说法。<br>小孩子的足球应该纯粹一点，你到了成年人的世界，搞点功利点的事也就算了，毕竟职业体育里这种事比比皆是，小孩子还是别搞这些，太傻逼了。 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12338669">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+昨天 01:43:51 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842473.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842473.htm#post_12338669" title="卧槽，黄哥之前有roll过点吗，难道他之前roll点都是复制的？" class="text-grey">
+《卧槽，黄哥之前有roll过点吗，难道他之前roll点都是复制的？》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842473.htm#post_12338669" title="主题回复">
+以前可以复制的 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12337810">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+04-10 18:21:41 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842362.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842362.htm#post_12337810" title="黄哥今天3-1了，你们还不畏惧吗" class="text-grey">
+《黄哥今天3-1了，你们还不畏惧吗》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842362.htm#post_12337810" title="主题回复">
+你tm能闭嘴吗 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12333846">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+04-09 13:44:14 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-842078.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-842078.htm#post_12333846" title="我不理解对线把宙斯碾压了，为什么还能十分钟3000出头" class="text-grey">
+《我不理解对线把宙斯碾压了，为什么还能十分钟3000出头》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-842078.htm#post_12333846" title="主题回复">
+我跟NEC都很穷啊，宙斯跟我有毛关系，他又不是中单。<br>崩是因为白牛带着我冲了两波越塔送了，后面阵容没肉，我转肉来不及了，打起来全在跑。 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12332446">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+04-09 03:03:29 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-841990.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-841990.htm#post_12332446" title="黄旭东闹麻了 喝水也是他提的 分锅也是他提的 最后自己背大锅就不说话了" class="text-grey">
+《黄旭东闹麻了 喝水也是他提的 分锅也是他提的 最后自己背大锅就不说话了》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-841990.htm#post_12332446" title="主题回复">
+喝不动了啊。 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12332395">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+04-09 02:58:34 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-841952.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-841952.htm#post_12332395" title="喝水还是太轻松了，可以改成吃冰块吗？" class="text-grey">
+《喝水还是太轻松了，可以改成吃冰块吗？》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-841952.htm#post_12332395" title="主题回复">
+差不多得了啊，当乐子人也不用瞎比搞吧。 </a>
+</div>
+</div>
+</div>
+</li>
+<li class="media post sc-follow-timeline-12332376">
+<a title="土豆黄2024" href="?user-89053.htm" class="mr-3" tabindex="-1">
+<img uid="89053" class="avatar-3" src="https://www.scboy.cc/upload/avatar/000/89053.png?1707927579">
+</a>
+<div class="media-body">
+<div class="d-flex justify-content-between text-muted">
+<div class="sc-follow-timeline-title small">
+<a class="text-muted font-weight-bold" href="?user-89053.htm" title="土豆黄2024">
+<span class="text-muted">土豆黄2024</span>
+</a>
+<span class="ml-2 text-muted small">
+04-09 02:56:48 </span>
+</div>
+</div>
+<div class="message mt-2 break-all sc-follow-timeline-post tap" data-href="?thread-841973.htm">
+<div class="text-grey small sc-follow-timeline-action">
+对主题
+<a target="_blank" href="?thread-841973.htm#post_12332376" title="有一说一，这喝水一瓶两瓶差不多了，3瓶5瓶乃至更多真别吧" class="text-grey">
+《有一说一，这喝水一瓶两瓶差不多了，3瓶5瓶乃至更多真别吧》
+</a>
+进行了回复
+</div>
+<div class="mt-3">
+<a class="text-dark" target="_blank" href="?thread-841973.htm#post_12332376" title="主题回复">
+主要打了第二把，第一把分分没啥，第二把确实喝不动了。<br>喝完差不多就撤了。 </a>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<nav><ul class="pagination justify-content-center"><li class="page-item active"><a href="?user-89053-1.htm" class="page-link">1</a></li><li class="page-item"><a href="?user-89053-2.htm" class="page-link">2</a></li><li class="page-item"><a href="?user-89053-3.htm" class="page-link">3</a></li><li class="page-item"><a href="?user-89053-4.htm" class="page-link">4</a></li><li class="page-item"><a href="?user-89053-5.htm" class="page-link">5</a></li><li class="page-item"><a href="?user-89053-6.htm" class="page-link">6</a></li><li class="page-item"><a href="?user-89053-7.htm" class="page-link">7</a></li><li class="page-item"><a href="?user-89053-8.htm" class="page-link">8</a></li><li class="page-item"><a href="?user-89053-9.htm" class="page-link">9</a></li><li class="page-item"><a href="?user-89053-10.htm" class="page-link">10</a></li><li class="page-item"><a href="?user-89053-261.htm" class="page-link">...261</a></li><li class="page-item"><a href="?user-89053-2.htm" class="page-link">▶</a></li></ul></nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>var nodes =document.getElementsByTagName("img");for (var i =0,node;node =nodes[i];i++) {if(node.className =="lazy") {node.removeAttribute("src");}
+}
+</script>
+</div>
+</main>
+<footer class="text-muted small bg-dark py-4 mt-3" id="footer">
+<div class="container">
+<div class="row">
+<div class="col">
+Powered by <a href="https://www.scboy.cc/" target="_blank" class="text-muted"><b>星际老男孩</b></a>
+<br>
+<a onclick="showDarkModeModal()" style="color: #ffe5ae; cursor: pointer;"><i class="icon icon-moon-o"></i> 夜间模式</a>
+</div>
+<div class="col text-right">
+Processed: <b>0.036</b>,</b>
+<p><a href="https://www.12377.cn"><b>违法和不良信息举报中心 | </b></a><a href="https://www.shjbzx.cn"><b>上海互联网违法和不良信息举报中心</b></a><b> | 网站举报电话：+86 17521024767 | </b><a href="https://beian.miit.gov.cn/" target="_blank"><b>沪ICP备19017570号-4</b></a></p> </div>
+</div>
+</div>
+</footer>
+<!--[if ltg IE 9]>
+	<script>window.location = '?browser.htm';</script>
+	<![endif]-->
+<script src="lang/zh-cn/bbs.js?2.0.29"></script>
+<script src="view/js/jquery-3.3.1.js?2.0.29"></script>
+<script src="view/js/popper.js?2.0.29"></script>
+<script src="view/js/bootstrap.js?2.0.29"></script>
+<script src="view/js/xiuno.js?2.0.29"></script>
+<script src="view/js/bootstrap-plugin.js?2.0.29"></script>
+<script src="view/js/async.js?2.0.29"></script>
+<script src="view/js/form.js?2.0.29"></script>
+<script>var debug =DEBUG =0;var url_rewrite_on =0;var forumarr ={"1":"科普鲁星区(星际2)","2":"乔伊雷酒吧(水区)","13":"直播讨论","3":"魔兽争霸III综合","4":"论坛功能/BUG报告","5":"魔兽世界综合","6":"战术讨论","7":"UNN播报","8":"泽鲁斯之地","9":"黑洞","10":"炉石传说","11":"时空枢纽"
+};var fid =0;var uid =22623;var gid =105;xn.options.water_image_url ='view/img/water-small.png';</script>
+<script src="view/js/bbs.js?2.0.29"></script>
+<script>$(document).on('click','.js-sc-follow-add',function() {$(this).attr("disabled","disabled");var thiz =$(this);var uid =thiz.attr("data-uid");var url ='?follow-create.htm';$.xpost(url,{'uid':uid},function(code,msg){if (code ==1) {thiz.removeClass('js-sc-follow-add')
+.addClass('js-sc-follow-del')
+.attr('title','取消关注');thiz.find(".icon").removeClass('icon-plus')
+.addClass('icon-check')
+.attr("aria-label",'取消关注');thiz.find(".sc-follow-btn")
+.text('已关注');try {if(typeof(eval(follow_add_after)) =="function") {follow_add_after(uid);}
+} catch(e) {}
+} else {$.alert(msg);}
+thiz.removeAttr("disabled");});});$(document).on('click','.js-sc-follow-del',function() {$(this).attr("disabled","disabled");var thiz =$(this);var uid =thiz.attr("data-uid");var url ='?follow-delete.htm';$.xpost(url,{'uid':uid},function(code,msg){if (code ==1) {thiz.removeClass('js-sc-follow-del')
+.addClass('js-sc-follow-add')
+.attr('title','关注');thiz.find(".icon").removeClass('icon-check')
+.addClass('icon-plus')
+.attr("aria-label",'关注');thiz.find(".sc-follow-btn")
+.text('关注');try {if(typeof(eval(follow_del_after)) =="function") {follow_del_after(uid);}
+} catch(e) {}
+} else {$.alert(msg);}
+thiz.removeAttr("disabled");});});$(document).on('click','.js-sc-follow-remove',function() {$(this).attr("disabled","disabled");var thiz =$(this);var uid =thiz.attr("data-uid");var url ='?follow-remove.htm';$.xpost(url,{'uid':uid},function(code,msg){if (code ==1) {$(".sc-follower-"+uid).remove();} else {$.alert(msg);}
+thiz.removeAttr("disabled");});});</script>
+<script>$('.mod-button button.sg_highlight').on('click',function() {var modtid =$('input[name="modtid"]').checked();if(modtid.length ==0) return $.alert(lang.please_choose_thread);var radios =xn.form_radio('sg_highlight',{"0":"取消高亮","1":"<span style=\"color:#ff0000;\">高亮一</span>","2":"<span style=\"color:#0e990b;\">高亮二</span>","3":"<span style=\"color:#007ef7;\">高亮三</span>","4":"<span style=\"color:#f900ff;\">高亮四</span>","5":"<span style=\"color:#ff8200;\">高亮五</span>"});$.confirm("设置主题为高亮",function() {var tids =xn.implode('_',modtid);var sg_highlight =$('input[name="sg_highlight"]').checked();var postdata ={sg_highlight:sg_highlight};$.xpost(xn.url('mod-sg_highlight-'+tids),postdata,function(code,message) {if(code !=0) return $.alert(message);$.alert(message).delay(1000).location('');});},{'body':'<p>选择高亮：'+radios+'</p>'});})
+</script><script></script><script>function xn_read_unread(tids,tid) {var time =xn.time();var time_range =86400 *3;var recent_tids =$.pdata('recent_tids') ||{};var view_tids =$.pdata('view_tids') ||{};function fetch_recent_tids(tids) {var changed =false;$.each(tids,function(tid,last_date) {if(time - last_date < time_range) {recent_tids[tid] =last_date;changed =true;}
+});if(changed) $.pdata('recent_tids',recent_tids);}
+	function gc_recent_tids() {var changed =false;$.each(recent_tids,function(tid,last_date) {if(time - last_date >time_range) {delete recent_tids[tid];changed =true;}
+});if(changed) $.pdata('recent_tids',recent_tids);}
+function gc_view_tids() {var changed =false;$.each(view_tids,function(tid,last_date) {if(!recent_tids[tid]) {delete view_tids[tid];changed =true;}
+});if(changed) $.pdata('view_tids',view_tids);}
+function save_view_tid(tid) {if(!recent_tids[tid]) return;view_tids[tid] =time;$.pdata('view_tids',view_tids);}
+if(tids) {fetch_recent_tids(tids);gc_recent_tids();}
+if(tid) save_view_tid(tid);$('.thread').each(function() {var jthis =$(this);var tid =jthis.attr('tid') ||jthis.data('tid');if(recent_tids[tid] &&recent_tids[tid] >xn.intval(view_tids[tid])) {jthis.find('.subject').addClass('font-weight-bold');}
+});}
+</script><script type="text/javascript">var is_mobile =false;</script>
+<div class="usercard-content">
+<div class="usercard-main">
+<div class="usercard-img"><img id="usercard_avatar" src="#" /></div>
+<div class="tit"><b id="usercard_name"></b> <span id="usercard_groupname"></span></div>
+<div class="list">
+<p>
+<span data-toggle="tooltip" data-placement="top" id="usercard_credits" title="" class="icon icon1"></span>
+<span data-toggle="tooltip" data-placement="top" id="usercard_threads" title="" class="icon icon2"></span>
+<span data-toggle="tooltip" data-placement="top" id="usercard_posts" title="" class="icon icon3"></span>
+<span data-toggle="tooltip" data-placement="top" id="usercard_golds" title="" class="icon icon4"></span>
+<span data-toggle="tooltip" data-placement="top" id="usercard_followeds" title="" class="icon icon5"></span>
+<span data-toggle="tooltip" data-placement="top" id="usercard_follows" title="" class="icon icon6"></span>
+<button class="btn btn-sm btn-outline-secondary" id="usercard_comment_btn" href="javascript:;" data-username="" data-uid="" data-modal-url="?sx.htm" data-modal-title="给  发送私信" data-modal-arg="" title="发送私信">
+<i class="icon icon-comment" aria-label="发消息"></i>
+<span class="sc-follow-btn">消息</span>
+</button>
+<button class="btn btn-sm btn-outline-secondary" id="usercard_follow_btn" data-uid="">
+<i class="icon icon-plus" aria-label="关注"></i>
+<span class="sc-follow-btn">关注</span>
+</button>
+</p>
+<p>
+</p>
+</div>
+</div>
+</div>
+<style>.dt-usercard{position:relative}.usercard-dt img{width:75pt;height:75pt}.usercard-content{background-color:#fff;width:365px;height:110px;display:none;position:absolute;top:-115px;left:0;z-index:999;border-radius:5px;padding:17px;box-shadow:2px 2px 17px #666}.style-bg{background-repeat:no-repeat;background-color:transparent;background-size:cover;background-position:50%;width:394px;height:198px;padding:0;top:-205px}.style-bg .usercard-img{left:17px;top:-35px}.style-bg .usercard-main{margin-top:118px;position:relative;padding:25px 17px 7px;background-image:linear-gradient(90deg,#A5CEC65c,hsla(0,0%,100%,.65),hsla(0,0%,100%,.65));border-radius:0 0 5px 5px;height:5pc}.usercard-img{position:absolute;left:17px;top:-40px}.usercard-img,.usercard-img img{width:70px;height:70px}.usercard-content .tit{margin-left:85px;position:relative;top:-10px}.usercard-content .tit b{color:#09347f;font-size:1pc}.usercard-content .tit .fontStyle{font-size:13px}.usercard-content .tit span{color:#777373;font-size:9pt;margin-left:4px}.usercard-content .list{margin-top:5px}.style-bg .list{margin-top:0}.usercard-content p{margin:0;position:relative}.usercard-content .btn{margin-left:10px;float:right;top:-7px}.usercard-content .list .icon{display:inline-block;background-repeat:no-repeat;background-size:contain;margin-right:6px}.usercard-content .list .icon1{width:17px;height:17px;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-24.png)}.usercard-content .list .icon1:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-25.png)}.usercard-content .list .icon2{width:15px;height:1pc;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-26.png)}.usercard-content .list .icon2:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-27.png)}.usercard-content .list .icon3{width:19px;height:14px;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-28.png);position:relative}.usercard-content .list .icon3:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-29.png)}.usercard-content .list .icon4{width:13px;height:15px;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-34.png)}.usercard-content .list .icon4:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-35.png)}.usercard-content .list .icon5{width:1pc;height:1pc;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-36.png)}.usercard-content .list .icon5:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-37.png)}.usercard-content .list .icon6{width:15px;height:1pc;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-38.png)}.usercard-content .list .icon6:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-39.png)}.usercard-content .list .icon7{width:13px;height:15px;background-image:url(plugin/xn_theme_xiaose/img/image-scboy-40.png)}.usercard-content .list .icon7:hover{background-image:url(plugin/xn_theme_xiaose/img/image-scboy-41.png)}.card-postlist .media,.floor_con .media{position:relative}</style>
+<script>$('#xs_checkin_btn').on('click',function() {$(this).attr('href','#').html('签到中...');$.xpost(xn.url('mod-checkin'),{},function(code,message) {$('#nav-checkin').remove();if(code !=0) return $.alert(message);$.alert(message).delay(10000);});});</script><script>$('a.xs_report_btn').on('click',function() {var postid =$(this).attr('postid');if(!postid) return $.alert('请选择举报对象');var radios =xn.form_radio('rtype',{"1":"广告垃圾","2":"违规内容","3":"恶意灌水","4":"节奏/引战","5":"其他","6":"楼中楼回复违规"});$.confirm("举报",function() {var rtype =$('input[name="rtype"]').checked();if(rtype =="") {$('#report_body').append('必须选择类型');}
+var postdata ={rtype:rtype};$.xpost(xn.url('mod-xs_report-'+postid),postdata,function(code,message) {if(code !=0) return $.alert(message);$.alert(message).delay(1000);});},{'body':'<p id="report_body">选择举报类型：'+radios+'</p>'});})
+$('.mod-button button.xs-manage-thread-updown').on('click',function() {var modtid =$('input[name="modtid"]').checked();if(modtid.length ==0) return $.alert(lang.please_choose_thread);var radios =xn.form_radio('xs-thread_updown',{"1":"上升","2":"下降"});$.confirm("设置主题上升和下降",function() {var tids =xn.implode('_',modtid);var updown =$('input[name="xs-thread_updown"]').checked();var postdata ={updown:updown};$.xpost(xn.url('mod-xs_manage_thread_updown-'+tids),postdata,function(code,message) {if(code !=0) return $.alert(message);$.alert(message).delay(1000).location('');});},{'body':'<p>选择上升或下降：'+radios+'</p>'});})
+</script>
+<script src="plugin/zl_share/static/jquery.share.min.js"></script>
+</body>
+</html>
+<script type="text/javascript" charset="utf-8">!function(a,b,c,d){var e=a(b);a.fn.lazyload=function(f){function g(){var b=0;i.each(function(){var c=a(this);if(!j.skip_invisible||c.is(":visible"))if(a.abovethetop(this,j)||a.leftofbegin(this,j));else if(a.belowthefold(this,j)||a.rightoffold(this,j)){if(++b>j.failure_limit)return!1}else c.trigger("appear"),b=0})}var h,i=this,j={threshold:0,failure_limit:0,event:"scroll",effect:"show",container:b,data_attribute:"original",skip_invisible:!1,appear:null,load:null,placeholder:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"};return f&&(d!==f.failurelimit&&(f.failure_limit=f.failurelimit,delete f.failurelimit),d!==f.effectspeed&&(f.effect_speed=f.effectspeed,delete f.effectspeed),a.extend(j,f)),h=j.container===d||j.container===b?e:a(j.container),0===j.event.indexOf("scroll")&&h.bind(j.event,function(){return g()}),this.each(function(){var b=this,c=a(b);b.loaded=!1,(c.attr("src")===d||c.attr("src")===!1)&&c.is("img")&&c.attr("src",j.placeholder),c.one("appear",function(){if(!this.loaded){if(j.appear){var d=i.length;j.appear.call(b,d,j)}a("<img />").bind("load",function(){var d=c.attr("data-"+j.data_attribute);c.hide(),c.is("img")?c.attr("src",d):c.css("background-image","url('"+d+"')"),c[j.effect](j.effect_speed),b.loaded=!0;var e=a.grep(i,function(a){return!a.loaded});if(i=a(e),j.load){var f=i.length;j.load.call(b,f,j)}}).attr("src",c.attr("data-"+j.data_attribute))}}),0!==j.event.indexOf("scroll")&&c.bind(j.event,function(){b.loaded||c.trigger("appear")})}),e.bind("resize",function(){g()}),/(?:iphone|ipod|ipad).*os 5/gi.test(navigator.appVersion)&&e.bind("pageshow",function(b){b.originalEvent&&b.originalEvent.persisted&&i.each(function(){a(this).trigger("appear")})}),a(c).ready(function(){g()}),this},a.belowthefold=function(c,f){var g;return g=f.container===d||f.container===b?(b.innerHeight?b.innerHeight:e.height())+e.scrollTop():a(f.container).offset().top+a(f.container).height(),g<=a(c).offset().top-f.threshold},a.rightoffold=function(c,f){var g;return g=f.container===d||f.container===b?e.width()+e.scrollLeft():a(f.container).offset().left+a(f.container).width(),g<=a(c).offset().left-f.threshold},a.abovethetop=function(c,f){var g;return g=f.container===d||f.container===b?e.scrollTop():a(f.container).offset().top,g>=a(c).offset().top+f.threshold+a(c).height()},a.leftofbegin=function(c,f){var g;return g=f.container===d||f.container===b?e.scrollLeft():a(f.container).offset().left,g>=a(c).offset().left+f.threshold+a(c).width()},a.inviewport=function(b,c){return!(a.rightoffold(b,c)||a.leftofbegin(b,c)||a.belowthefold(b,c)||a.abovethetop(b,c))},a.extend(a.expr[":"],{"below-the-fold":function(b){return a.belowthefold(b,{threshold:0})},"above-the-top":function(b){return!a.belowthefold(b,{threshold:0})},"right-of-screen":function(b){return a.rightoffold(b,{threshold:0})},"left-of-screen":function(b){return!a.rightoffold(b,{threshold:0})},"in-viewport":function(b){return a.inviewport(b,{threshold:0})},"above-the-fold":function(b){return!a.belowthefold(b,{threshold:0})},"right-of-fold":function(b){return a.rightoffold(b,{threshold:0})},"left-of-fold":function(b){return!a.rightoffold(b,{threshold:0})}})}(jQuery,window,document);</script>
+<script>$(function(){$('.message img:not(.nolazy)').each(function(){$(this).addClass("lazy img-responsive");$(this).attr("data-original",$(this).attr("src")).removeAttr("src");});$(".message img.lazy").lazyload({effect:"fadeIn",threshold :300});});$(function(){$('.pic img:not(.nolazy)').each(function(){$(this).addClass("lazy img-responsive");$(this).attr("data-original",$(this).attr("src")).removeAttr("src");});$(".pic img.lazy").lazyload({effect:"fadeIn",threshold :200});});</script>
+<style type="text/css">.actGotop{position:fixed;_position:absolute;bottom:80px;right:10px;width:67px;height:100px;display:none;}.actGotop a,.actGotop a:link{width:67px;height:100px;display:inline-block;background:url(plugin/l4c_top/other/images/gotop2.png) no-repeat;_background:url(plugin/l4c_top/other/images/gotop2.gif) no-repeat;outline:none;}.actGotop a:hover{background:url(plugin/l4c_top/other/images/gotop2.gif) no-repeat;outline:none;}</style>
+<div class="actGotop"><a href="javascript:;" title="返回顶部"></a></div>
+<script type="text/javascript">$(function(){$(window).scroll(function() {if($(window).scrollTop() >=100){$('.actGotop').fadeIn(300);}else{$('.actGotop').fadeOut(300);} 
+});$('.actGotop').click(function(){$('html,body').animate({scrollTop:'0px'},800);});});</script>
+<script>$(function() {$('.mod-button button.delete').off('click').on('click',function() {var modtid =$('input[name="modtid"]').checked();if(modtid.length ==0) return $.alert(lang.please_choose_thread);var radios ='';var tids;if(window.location.href.indexOf("thread") >-1){var current_tid =window.location.href.split("thread-")[1].split(".")[0];}
+$.confirm(xn.lang('confirm_delete_thread',{n:modtid.length}) + '<br><br>'+radios,function() {var type =$('input[name="type"]').checked();var postdata ={};postdata.tidarr =modtid;postdata.type =type;$.xpost(xn.url('mod-delete-'+tids),postdata,function(code,message) {if(code !=0) return $.alert(message);$.alert(message).delay(1000).location('');});});})
+	$('body').on('click','.post_recover',function() {var jthis =$(this);var href =jthis.data('href');var isfirst =jthis.attr('isfirst');if(window.confirm('确定恢复删除的帖子？')) {$.xpost(href,function(code,message) {var isfirst =jthis.attr('isfirst');if(code ==0) {if(isfirst =='1') {$.location('?forum-0.htm');} else {window.location.reload();}
+} else {$.alert(message);}
+});}
+return false;});})
+</script>
+<div style="display:none;"><script type="text/javascript" src="https://s5.cnzz.com/z_stat.php?id=1277689586&web_id=1277689586"></script></div>
+<script>$('.btn-ban-yy').click(function () {var _uid =$(this).attr('data-uid');$(this).remove();$.xpost('mod-ban_yy.htm',{uid:_uid},function(code,msg) {if (code ==0) {var logs ='';var _data =$.parseJSON(msg);for(var i=0;i<_data.length;i++) {var showInfo ='';if(_data[i]['state_fmt'] =='解封') {showInfo ="系统 解封";}else {showInfo =_data[i]['admin_username'] + ' ' + _data[i]['state_fmt'] +' 原因: '+_data[i]['remark'];}
+logs +='<p>' + _data[i]['opt_date_fmt'] + ' 被 ' +showInfo+'</p>';}
+$('.sc-banuser').after('<div class="media-body"><div class="justify-content-between text-muted">'+logs+'</div></div>');console.log(msg);}
+});});</script>
+<script>$('a[data-active="menu-user"]').addClass('active');</script>
+<script>$('a[data-active="user-profile"]').addClass('active');</script>
