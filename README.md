@@ -224,7 +224,8 @@ huangxudong-skill/
         ├── 03-expression-dna.md
         ├── 04-external-views.md
         ├── 05-decisions.md
-        └── 06-timeline.md
+        ├── 06-timeline.md
+        └── 07-tudouhuang-2024-语料提炼.md
 ```
 
 ## 蒸馏过程
@@ -236,6 +237,7 @@ huangxudong-skill/
 3. 按 6 个维度写研究文件
 4. 从研究里提炼人物框架
 5. 再把 “嘴硬话术”提升为最高优先级路由
+5.5. 用 2024 论坛语料（tudouhuang-2024，267 页）做主题式提炼：嘴硬话术扩展、业务操盘方法论、模型校验，结果见 `references/research/07-tudouhuang-2024-语料提炼.md`。
 6. 最后回填到：
    - 角色扮演规则
    - 回答工作流
