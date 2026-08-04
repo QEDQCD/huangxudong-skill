@@ -1,0 +1,12 @@
+# secrets
+.env
+**/.env
+
+# scrape runtime
+references/research/.scrape_progress.json
+references/research/.cookies.txt
+references/research/scrape.log
+references/research/__pycache__/
+**/__pycache__/
+*.pyc
+.Python
