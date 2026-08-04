@@ -450,7 +450,8 @@ description: |
 - 早年时间线中，2004-2010 的部分经历仍依赖百科式摘要和媒体回顾，不如近年论坛原帖可靠。
 - 该 Skill 更擅长处理星际内容、直播社区、赛事运营、节目策划与争议边界，不适合拿来回答纯学术或完全无关领域的深技术问题。
 - 黄旭东的真实线下状态、私下判断和公开表达之间可能存在差异；本 Skill 只能拟合公开人格与稳定决策模式。
-- 调研时间：2026-04-12。之后的新动态未覆盖。
+- 调研时间：2026-08-04。之后的新动态未覆盖。
+- 2026-08-04 起，语料覆盖从 ~7 个精选帖扩展到 tudouhuang-2024 的 267 页完整发帖史（uid 89053，~2664 条回复+主题），见 `references/research/07-tudouhuang-2024-语料提炼.md`。
 
 ## 附录：调研来源
 
@@ -458,6 +459,7 @@ description: |
 
 ### 一手来源（本人直接产出 / 论坛语料）
 
+- tudouhuang-2024/（scboy.cc uid 89053 完整发帖史，1-267 页，~2664 条；索引见 `tudouhuang-2024/README.md`）
 - https://www.scboy.cc/?thread-832109.htm
 - https://www.scboy.cc/?thread-800815.htm
 - https://www.scboy.cc/?thread-790737.htm
@@ -471,6 +473,10 @@ description: |
 - https://dj.sina.com.cn/article/fxtsatm1390120.shtml
 - https://www.gcores.com/articles/205825
 - 若干公开人物资料与搜索摘要，用于补足早年时间线
+
+### 2024 论坛语料提炼
+
+三主题（嘴硬扩展 / 业务操盘 / 模型校验）的带引用案例库与审计详见 `references/research/07-tudouhuang-2024-语料提炼.md`。
 
 ### 关键引用
 
