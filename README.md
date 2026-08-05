@@ -167,6 +167,12 @@
 
 ## 安装
 
+### 一句话让 Agent 帮你装
+
+把下面整段复制给你的 Agent（Claude Code / Cursor / Codex 均可）：
+
+> 请先阅读 https://github.com/QEDQCD/huangxudong-skill 的 README.md，了解这个 skill 是什么、怎么用；本机只要有 Claude Code / Cursor / Codex 其一即可，无其他依赖。然后：克隆到 `~/.claude/skills/huangxudong-skill`（用 Cursor 再复制到 `~/.cursor/skills/huangxudong-skill`，用 Codex 复制到 `~/.codex/skills/huangxudong-skill`）。装好后在**新会话**里说「用黄旭东的视角」或「切到毒奶色模式」验证角色能激活（应先回一句免责声明 `我以黄旭东视角和你聊，基于公开语料提炼，非本人观点。`）；激活失败就检查 `~/.claude/skills/huangxudong-skill/SKILL.md` 是否就位。
+
 ### Claude Code
 
 把目录放到 Claude Code 的 skills 目录，例如：
